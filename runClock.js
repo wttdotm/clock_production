@@ -1,10 +1,15 @@
 let today = new Date(Date.now()-(18000000))
 let yesterday = new Date(Date.now()-(104400000))
-let numericalToday = (today.toISOString()).slice(0,10)
-let numericalYesterday = (yesterday.toISOString()).slice(0,10)
+// let numericalToday = (today.toISOString()).slice(0,10)
+// let numericalYesterday = (yesterday.toISOString()).slice(0,10)
+
+let numericalToday = '2022-10-12'
+let numericalYesterday = '2022-10-11'
+
 
 let birthdate = new Date(Date.UTC(96, 4, 12, 4, 45, 0)-18000000)
 const videoDurations = require(`./data/${numericalToday}.json`)
+// const videoDurations = require(`./data/${numericalToday}.json`)
 
 let videoTotalToday = videoDurations.durationLog[numericalToday]
 // videoTotalToday = (833567904060 + 1440*60*1000*3)
@@ -69,7 +74,7 @@ function updateTime (){
     var s = Math.floor((clockCalc % (dInMs + hInMs + mInMs)) / 1000) // || Math.floor((clockCalc) / 1000)
     //hours is the remainder of time of clockToday % days in ms
     posProgress ? clockCalc -= 1000 : clockCalc += 1000
-    console.log(`Status: ${color} | Days: ${Math.abs(d)} | Hours ${Math.abs(h)} | Minutes ${Math.abs(m)} | Seconds ${Math.abs(s)}`)
+    console.log(`Status: ${color} | Days: ${Math.abs(d)} | Hours ${Math.abs(h)} | Minutes ${Math.abs(m).length === 2 ? Math.abs(m) : "O"+Math.abs(m)} | Seconds ${Math.abs(s).length === 2 ? Math.abs(s) : "O"+Math.abs(s)}`)
 }
 
 
