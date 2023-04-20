@@ -2,8 +2,8 @@ const LedMatrix = require('easybotics-rpi-rgb-led-matrix')
 let matrix = new LedMatrix(16,64,1,1,100,"adafruit-hat")
 const font = "./fonts/6x13.bdf"
 
-let today = new Date(Date.now()-(18000000))
-let yesterday = new Date(Date.now()-(104400000))
+let today = new Date(Date.UTC(2022, 9, 16, 12, 0))
+let yesterday = new Date(Date.UTC(2022, 9, 15, 12, 0))
 let numericalToday = (today.toISOString()).slice(0,10)
 let numericalYesterday = (yesterday.toISOString()).slice(0,10)
 
@@ -14,7 +14,7 @@ let videoTotalToday = videoDurations.durationLog[numericalToday]
 // videoTotalToday = (833567904060 + 1440*60*1000*3)
 let videoTotalYesterday = videoDurations.durationLog[numericalYesterday]
 // videoTotalYesterday = (833481504060-10000)
-
+console.log(videoTotalToday,videoTotalYesterday)
 // 0. Get lifeTotalToday and lifeTodayYesterday, which is the difference of time today/yesteday and birthdate
 let lifeTotalToday = today - birthdate
 console.log("life total today: ", lifeTotalToday)
@@ -28,7 +28,7 @@ let differenceYesterday = lifeTotalYesterday - videoTotalYesterday
 console.log(differenceYesterday, differenceToday)
 // 3. Get dailyProgress, which is the difference of time between differenceYesterday from differenceToday (dT - dY)
 // ideally, it will be below 0 (meaning that the difference is smaller got closer to 0 total difference)
-let dailyProgress = differenceToday-differenceYesterday
+let dailyProgress = differenceToday-differenceYesterday-(2160000000)
 let posProgress = dailyProgress < 0
 console.log(posProgress)
 
@@ -89,7 +89,7 @@ function updateTime (){
     } 
     let input = `${d}:${h}:${m}:${s}`
     matrix.clear()
-    matrix.drawText(1,0,input,font,...red)
+    matrix.drawText(1,2,input,font,...red)
     matrix.update()
    //hours is the remainder of time of clockToday % days in ms
     posProgress ? clockCalc -= 1000 : clockCalc += 1000
