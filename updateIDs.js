@@ -7,7 +7,7 @@ const url = "https://www.tiktok.com/@wttdotm";
 (async () => {
     //initialize puppeteer, go to 
   const browser = await puppeteer.launch({
-          headless: true,
+          headless: 'new',
 	  args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
   const page = await browser.newPage();

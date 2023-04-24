@@ -1,116 +1,104 @@
-const LedMatrix = require('easybotics-rpi-rgb-led-matrix')
-let matrix = new LedMatrix(16,64,1,1,100,"adafruit-hat")
-const font = "./fonts/6x13.bdf"
+const addZeros = (timeUnit, isDay = false) =>  {
+  const totalLength = isDay ? 3 : 2
+  timeUnit = timeUnit.toString()
+  while (timeUnit.length < totalLength) {
+    timeUnit = `0${timeUnit}`
+  }
+  return timeUnit
+}
+const getTimeUnits = (timeVal) => {
+  let d = Math.floor(timeVal / (1000 * 60 * 60 * 24))
+  let dInMs = d * 86400000
+  // console.log("time mins d in ms", timeVal - dInMs, d)
+  // console.log("time mod  d in ms", timeVal % dInMs)
+  // console.log(Math.floor((timeVal % dInMs)))
+  let h = Math.floor((timeVal - dInMs)/(1000*60*60))
+  let hInMs = h * (86400000/24)
+  let m = Math.floor((timeVal - (dInMs + hInMs)) / (1000*60))
+  let mInMs = m * (60000)
+  let s = Math.floor((timeVal -(dInMs + hInMs + mInMs)) / 1000) 
+  d = addZeros(d, true)
+  h = addZeros(h)
+  m = addZeros(m)
+  s = addZeros(s)
+  // console.log(d,m,h,s)
+  return {d, h, m, s}
+}
 
-let today = new Date(Date.now()-(18000000))
-let yesterday = new Date(Date.now()-(104400000))
-let numericalToday = (today.toISOString()).slice(0,10)
-let numericalYesterday = (yesterday.toISOString()).slice(0,10)
+const dayLength = (1000 * 60 * 60 * 24)
+const today = new Date(Date.now())
+const yesterday = new Date(today - dayLength)
+const numericalToday = (today.toISOString()).slice(0,10) //202X-MM-DD
+const numericalYesterday = (yesterday.toISOString()).slice(0,10)//202X-MM-DD
 
-let birthdate = new Date(Date.UTC(96, 4, 12, 4, 45, 0)-18000000)
+const birthdate = new Date(Date.UTC(96, 4, 12, 4, 45, 0)-18000000)
 const videoDurations = require(`./data/${numericalToday}.json`)
 
-let videoTotalToday = videoDurations.durationLog[numericalToday]
-// videoTotalToday = (833567904060 + 1440*60*1000*3)
-let videoTotalYesterday = videoDurations.durationLog[numericalYesterday]
-// videoTotalYesterday = (833481504060-10000)
+const timeAliveToday = today - birthdate
+const timeAliveYesterday = yesterday - birthdate
 
-// 0. Get lifeTotalToday and lifeTodayYesterday, which is the difference of time today/yesteday and birthdate
-let lifeTotalToday = today - birthdate
-console.log("life total today: ", lifeTotalToday)
-let lifeTotalYesterday = yesterday - birthdate
-console.log("life total yesterday: ", lifeTotalYesterday)
+// get the video totals from today and yesterday
+const viewTimeToday = videoDurations.durationLog[numericalToday]// + (1440 * 1000 * 60 * 1000)
+// // const videoTotalToday = videoDurations.durationLog[numericalToday]// + (1440 * 1000 * 60 * 1000)
+// const viewTimeYesterday = viewTimeToday - (dayLength*3)
+const viewTimeYesterday = videoDurations.durationLog[numericalYesterday]
 
-// 1. Get differenceToday, which is difference of time between lifeTotalToday and videoTotalToday
-let differenceToday = lifeTotalToday - videoTotalToday 
-// 2. Get differenceYesterday, which is difference of time between lifeTotalYesterday and videoTotalYesterday
-let differenceYesterday = lifeTotalYesterday - videoTotalYesterday
-console.log(differenceYesterday, differenceToday)
-// 3. Get dailyProgress, which is the difference of time between differenceYesterday from differenceToday (dT - dY)
-// ideally, it will be below 0 (meaning that the difference is smaller got closer to 0 total difference)
-let dailyProgress = differenceToday-differenceYesterday
-let posProgress = dailyProgress < 0
-console.log(posProgress)
-
-// 4. Get dailyProgressAbs, which is the absolute value of dailyProgress
-let dailyProgressAbs = Math.abs(dailyProgress)
-// 5. Get incrementToday, which is dailyProgressAbs/length of a day, will give you the factor of increase/decrease
-let incrementToday = dailyProgressAbs/86400000
-// 6. Set clockToday to the value of differenceYesterday
+// const viewTimeToday = timeAliveToday + (dayLength * 2879)// + (1440 * 1000 * 60 * 1000)
+// const videoTotalToday = videoDurations.durationLog[numericalToday]// + (1440 * 1000 * 60 * 1000)
+// const viewTimeYesterday = timeAliveYesterday - (dayLength*1)
 
 
+// subtract lifeTimeToday from viewTimeToday to get distanceToday
+let distanceToday = viewTimeToday - timeAliveToday
+console.log("distance today:", distanceToday)
+// subtract lifeTimeYesterday from viewTimeYesterday to get distanceYesterday
+let distanceYesterday = viewTimeYesterday - timeAliveYesterday
+console.log("distance yesterday:", distanceYesterday)
 
-let timerInterval = (1000/incrementToday)
-let numberOfIntervals = Math.floor(86400000/timerInterval)
+// subtract distanceYesterday from distanceToday to get distanceMovement
+let distanceMovement = distanceToday - distanceYesterday || 1
+console.log("distanceMovement", distanceMovement)
 
-console.log(timerInterval)
-console.log(numberOfIntervals)
+// goal is to take a day to modify 'distanceYesterday' a 'distanceMovement' amount in increments of 1000
 
-//set the clock to the difference in time yesterday
-const clockToday = differenceYesterday
-//also set a clockCalc variable that we'll increment
-let clockCalc = clockToday
-console.log("heres clock calc", clockCalc)
+// we can get how many increments of 1000 by dividing distanceMovement by 1000
+let numIncrements = distanceMovement / 1000
+if (numIncrements > -1 && numIncrements < 1) numIncrements = 1
+console.log('numIncrements', numIncrements)
+// seconds per incremenet (aka interval) = seconds in a day / increments
+let interval = Math.abs((60 * 60 * 24) / numIncrements)
+console.log('interval in s', interval)
+// multiply interval by 1000 to get msInterval
+let msInterval = interval*1000
 
+// every msInterval, increment distanceYesterday by 1000
+// if distanceToday > distanceYesterday, increment it up
+// if distanceToday < distanceYesterday, incremenet it down
+let increment = 1000
+while (msInterval < 20) {
+  increment = increment * 2
+  msInterval = msInterval * 2
+}
 
 let red = [255,0,0]
 let green = [0,255,0]
 
-function updateTime (){
-    console.log("hello")
-    let color = clockCalc < 0 ? "green" : "red"
-    //NEED TO INSERT WIN CONDITION HERE
-    //ALSO NEED TO SOLVE FOR NEGATIVE NUMBERS
-    
-    //get the amount of days in the clock, which is the floor of days
-    //get the amount of hours after
-    
-    var d = Math.floor(clockCalc / (1000 * 60 * 60 * 24))
-    var dInMs = d * 86400000
-    var h = Math.floor((clockCalc % dInMs)/(1000*60*60))
-    var hInMs = h * (86400000/24)
-    var m = Math.floor((clockCalc % (dInMs + hInMs)) / (1000*60))
-    var mInMs = m * (60000)
-    var s = Math.floor((clockCalc % (dInMs + hInMs + mInMs)) / 1000) 
-    if (d.toString().length == 1) {
-	d = `00${d}`
-    }
-    if (d.toString().length == 2) {
-	d = `0${d}`
-    }
-    if (h.toString().length == 1) {
-	h = `0${h}`
-    }
-    if (m.toString().length == 1) {
-	m = `0${m}`
-    }
-    if (s.toString().length == 1) {
-	s = `0${s}`
-    } 
-    let input = `${d}:${h}:${m}:${s}`
-    matrix.clear()
-    matrix.drawText(1,0,input,font,...red)
-    matrix.update()
-   //hours is the remainder of time of clockToday % days in ms
-    posProgress ? clockCalc -= 1000 : clockCalc += 1000
-    console.log(`Status: ${color} | Days: ${Math.abs(d)} | Hours ${Math.abs(h)} | Minutes ${Math.abs(m)} | Seconds ${Math.abs(s)}`)
-}
+const iterate = setInterval(() => {
+  distanceMovement >= 0 ? distanceYesterday += increment : distanceYesterday -= increment
+  let color = distanceYesterday > 0 ? green : red
+  console.log(distanceYesterday)
+  const {d, h, m, s} = getTimeUnits(Math.abs(distanceYesterday))
+  let input = `${color}  ${d}:${h}:${m}:${s}`
+  
+  // matrix.clear()
+  // matrix.drawText(1,2,input,font,...color)
+  // matrix.update()
+  
+  console.log(input)
+}, msInterval)
+// then display distanceYEsterday
 
+// which we can consider movementSinceYesterdaySeconds
 
-// Returns a Promise that resolves after "ms" Milliseconds
-const timer = ms => new Promise(res => setTimeout(res, ms))
-
-async function load () { // We need to wrap the loop into an async function for this to work
-  for (var i = 0; i < numberOfIntervals; i++) {
-    updateTime();
-    console.log(clockCalc)
-    // setTimeout(updateTime, timerInterval);
-    await timer(timerInterval); // then the created Promise can be awaited
-  }
-}
-
-load();
-
-
-
-
+// movement since yesterday is in ms
+// day is also in ms

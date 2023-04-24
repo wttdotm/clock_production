@@ -96,11 +96,11 @@ async function getVideoDurations(videoArray, counter, error = false) {
         "method": "POST"
         });
         const result = await response.json()
-
+        // console.log(result)
         //define todays duration and prior duration, defualt to 0 for falsy info
-        let priorDuration = videoDurations[aweme_id][numericalYesterday].durationAtDate || 0
+        let priorDuration = videoDurations?.[aweme_id]?.[numericalYesterday]?.durationAtDate || 0
         let todayDuration = result['video_total_duration']['value'] || 0
-        let priorViews = videoDurations[aweme_id][numericalYesterday].viewsAtDate || 0
+        let priorViews = videoDurations?.[aweme_id]?.[numericalYesterday]?.viewsAtDate || 0
         let todayViews = result['video_uv']['value'] || 0
 
         //set pushable values (makes sure that bad/empty data does not sub in for old better data)
