@@ -1,5 +1,5 @@
 const LedMatrix = require('easybotics-rpi-rgb-led-matrix')
-let matrix = new LedMatrix(16,64,1,1,100,"adafruit-hat")
+let matrix = new LedMatrix(16,32,1,2,100,"adafruit-hat")
 const font = "./fonts/6x13.bdf"
 
 let today = new Date(Date.UTC(2022, 9, 16, 12, 0))
@@ -28,7 +28,7 @@ let differenceYesterday = lifeTotalYesterday - videoTotalYesterday
 console.log(differenceYesterday, differenceToday)
 // 3. Get dailyProgress, which is the difference of time between differenceYesterday from differenceToday (dT - dY)
 // ideally, it will be below 0 (meaning that the difference is smaller got closer to 0 total difference)
-let dailyProgress = differenceToday-differenceYesterday-(2160000000)
+let dailyProgress = differenceToday-differenceYesterday-(160000000)
 let posProgress = dailyProgress < 0
 console.log(posProgress)
 
@@ -56,6 +56,7 @@ console.log("heres clock calc", clockCalc)
 let red = [255,0,0]
 let green = [0,255,0]
 
+let i = 0
 function updateTime (){
     console.log("hello")
     let color = clockCalc < 0 ? "green" : "red"
@@ -89,6 +90,7 @@ function updateTime (){
     } 
     let input = `${d}:${h}:${m}:${s}`
     matrix.clear()
+//matrix.drawCircle(10,10,i++, ...red)
     matrix.drawText(1,2,input,font,...red)
     matrix.update()
    //hours is the remainder of time of clockToday % days in ms

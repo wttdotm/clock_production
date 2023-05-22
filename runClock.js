@@ -25,8 +25,14 @@ const getTimeUnits = (timeVal) => {
   return {d, h, m, s}
 }
 
+//IMPORTS
+const LedMatrix = require('easybotics-rpi-rgb-led-matrix')
+//let matrix = new LedMatrix(16,64,1,1,100,"adafruit-hat",'RGB',['isolcpus=3'])
+let matrix = new LedMatrix(16,32,1,2,99,"adafruit-hat",'RGB',['isolcpus=3'])
+const font = "./fonts/6x13.bdf"
+
 const dayLength = (1000 * 60 * 60 * 24)
-const today = new Date(Date.now())
+const today = new Date(Date.now() - dayLength)
 const yesterday = new Date(today - dayLength)
 const numericalToday = (today.toISOString()).slice(0,10) //202X-MM-DD
 const numericalYesterday = (yesterday.toISOString()).slice(0,10)//202X-MM-DD
@@ -88,11 +94,11 @@ const iterate = setInterval(() => {
   let color = distanceYesterday > 0 ? green : red
   console.log(distanceYesterday)
   const {d, h, m, s} = getTimeUnits(Math.abs(distanceYesterday))
-  let input = `${color}  ${d}:${h}:${m}:${s}`
+  let input = `${d}:${h}:${m}:${s}`
   
-  // matrix.clear()
-  // matrix.drawText(1,2,input,font,...color)
-  // matrix.update()
+  matrix.clear()
+  matrix.drawText(1,2,input,font,...color)
+  matrix.update()
   
   console.log(input)
 }, msInterval)
