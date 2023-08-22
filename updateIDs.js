@@ -9,7 +9,7 @@ const url = "https://www.tiktok.com/@wttdotm";
     //initialize puppeteer, go to 
   const browser = await puppeteer.launch({
 	  executablePath : '/usr/bin/chromium-browser',
-          headless: true,
+          headless: 'new',
 	  args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
   const page = await browser.newPage();
@@ -40,6 +40,7 @@ const url = "https://www.tiktok.com/@wttdotm";
   function justIDs (arr) {
     for (let i = 0; i<arr.length; i++) {
       newIDs.push(arr[i][1].slice(-19))
+	console.log(arr[i][1].slice(-19))
     }
   }
 //  console.log(html)

@@ -106,7 +106,7 @@ async function getVideoDurations(videoArray, counter, error = false) {
 
         //set pushable values (makes sure that bad/empty data does not sub in for old better data)
         let pushableDuration = todayDuration > priorDuration ? todayDuration : priorDuration
-        let pushableViews = todayViews > priorViews ? todayDuration : priorDuration
+        let pushableViews = todayViews > priorViews ? todayViews : priorViews
         
         //increment todays duration
         todaysDurationValue += pushableDuration

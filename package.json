@@ -1,0 +1,31 @@
+{
+  "name": "clock_production",
+  "version": "1.0.0",
+  "description": "",
+  "main": "getData.js",
+  "dependencies": {
+    "bufferutil": "^4.0.1",
+    "dotenv": "^16.0.3",
+    "easybotics-rpi-rgb-led-matrix": "^0.4.1",
+    "encoding": "^0.1.13",
+    "moment": "^2.29.4",
+    "puppeteer": "^9.0.0",
+    "rpi-led-matrix": "^1.14.0",
+    "typescript": "^5.0.4",
+    "utf-8-validate": "^5.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wttdotm/clock_production.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wttdotm/clock_production/issues"
+  },
+  "homepage": "https://github.com/wttdotm/clock_production#readme"
+}
